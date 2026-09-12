@@ -1,4 +1,3 @@
-
 import os
 import io
 import csv
@@ -29,7 +28,11 @@ STATUS_BADGES = {
     "Departed": "🔴 Departed"
 }
 
-st.set_page_config(page_title="Emergency Incident Node", layout="wide")
+st.set_page_config(
+    page_title="Incident Response Operations System",
+    page_icon="🚨",
+    layout="wide"
+)
 
 # --- Persistent State Initialization ---
 if "pin_authenticated" not in st.session_state:
@@ -56,6 +59,19 @@ if "restored_disk" not in st.session_state:
 
 
 # --- Core Helper Functions ---
+
+def render_branding_header():
+    """Renders top banner header with attribution credit."""
+    st.markdown(
+        """
+        <div style="background-color: #1e293b; padding: 18px; border-radius: 8px; margin-bottom: 20px; color: white;">
+            <h2 style="margin: 0; color: #f8fafc;">🚨 Incident Response Operations System</h2>
+            <p style="margin: 4px 0 0 0; color: #94a3b8; font-size: 0.9em;">Operational Dispatch & Field Resource Command Terminal</p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
 
 def process_and_save_image(uploaded_file):
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -145,13 +161,14 @@ def generate_csv_logs(inc_id):
 # --- UI VIEWS ---
 
 def show_landing_page():
-    st.title("🔒 Emergency Incident Gateway")
-    st.caption("Enter Station PIN to access operations")
-
+    render_branding_header()
+    
     col1, col2 = st.columns([1, 1])
     with col1:
+        st.subheader("🔒 Security Authentication")
+        st.caption("Enter Station PIN to access active operations terminal")
         with st.form("pin_form"):
-            pin_input = st.text_input("Enter Station Security PIN", type="password")
+            pin_input = st.text_input("Station Security PIN", type="password")
             if st.form_submit_button("Authenticate Access", use_container_width=True):
                 if pin_input == SECURITY_PIN:
                     st.session_state.pin_authenticated = True
@@ -159,13 +176,14 @@ def show_landing_page():
                     st.rerun()
                 else:
                     st.error("Invalid Security PIN")
+                    
     with col2:
-        st.info("ℹ️ **Default PIN:** `1234`")
+        st.info("ℹ️ **Default Security PIN:** `1234`")
+        st.caption("📸 **System Cover Image:** *Incident Response Operations System* — Source: Popcorn Arts / Getty Images")
 
 
 def show_incident_selector():
-    st.title("🚨 Emergency Incident Portal")
-    st.caption("Initialize a new incident or attach to an active/archived job")
+    render_branding_header()
 
     incidents = st.session_state.incidents
     active_incidents = {k: v for k, v in incidents.items() if v.get("status") == "Active"}
@@ -178,7 +196,7 @@ def show_incident_selector():
 
         with tab_active:
             if not active_incidents:
-                st.info("No active incidents. Initialize a job on the right.")
+                st.info("No active incidents. Initialize a job using the panel on the right.")
             else:
                 for inc_id, details in active_incidents.items():
                     with st.container(border=True):
@@ -402,6 +420,9 @@ def main():
         st.session_state.pin_authenticated = False
         st.session_state.selected_incident = None
         st.rerun()
+
+    st.sidebar.divider()
+    st.sidebar.caption("📷 *Cover Art:* Incident Response Operations System (Popcorn Arts / Getty Images)")
 
     if not st.session_state.selected_incident:
         show_incident_selector()
