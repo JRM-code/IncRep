@@ -302,12 +302,22 @@ def show_incident_feed():
     for item in logs:
         with st.container(border=True):
             col1, col2 = st.columns([1, 3])
+            
             with col1:
-                if os.path.exists(item['thumbnail']):
+                # Render thumbnail in column
+                if os.path.exists(item.get('thumbnail', '')):
                     st.image(item['thumbnail'], use_container_width=True)
+                elif os.path.exists(item.get('full_image', '')):
+                    st.image(item['full_image'], use_container_width=True)
+
             with col2:
                 st.markdown(f"**{item['responder']}** `{item['tag']}` — *{item['timestamp']}*")
                 st.write(item['note'])
+
+                # High-Res Image Expander View
+                if os.path.exists(item.get('full_image', '')):
+                    with st.expander("🔍 View High-Res Image"):
+                        st.image(item['full_image'], caption=f"Full Resolution Image (Logged by {item['responder']} at {item['timestamp']})", use_container_width=True)
 
 
 def show_appliance_checkin():
