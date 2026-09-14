@@ -3,7 +3,7 @@ import io
 import csv
 import json
 from datetime import datetime
-from PIL import Image
+from PIL import Image, ImageOps
 
 import streamlit as st
 from reportlab.lib.pagesizes import letter
@@ -84,6 +84,9 @@ def process_and_save_image(uploaded_file):
 
     image_bytes = uploaded_file.getvalue()
     with Image.open(io.BytesIO(image_bytes)) as img:
+        # Auto-rotate image based on EXIF camera orientation metadata
+        img = ImageOps.exif_transpose(img)
+        
         img = img.convert("RGB")
         
         # Save main compressed image
